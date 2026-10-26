@@ -88,7 +88,7 @@ async function handle(chatId: number, text: string) {
     if (!(amount > 0) || !["USD", "NGN"].includes(from) || !["street", "official"].includes(basis))
       return say(chatId, "Try: /convert 100 usd   or   /convert 50000 ngn official");
     const { data, tx } = await buy(`/v1/convert?amount=${amount}&from=${from}&basis=${basis}`);
-    return say(chatId, `🔁 <code>${JSON.stringify(data, null, 1)}</code>${paidLine("$0.005", tx)}`);
+    return say(chatId, `🔁 <code>${JSON.stringify(data, null, 1)}</code>${paidLine("$0.003", tx)}`);
   }
 
   return say(chatId, HELP);
