@@ -28,7 +28,7 @@ const price = (amount: number) => ({ amount: usd(amount), asset: ASSET.address, 
 const accepts = (amount: number) => [{ scheme: "exact", network: NETWORK, payTo: PAY_TO!, price: price(amount) }];
 
 // Paid routes. Prices are in USD, settled in USA₮ on mainnet.
-const PRICES = { rates: 0.01, convert: 0.005 };
+const PRICES = { rates: 0.01, convert: 0.003 };
 const routes = {
   "GET /v1/rates": {
     accepts: accepts(PRICES.rates),
