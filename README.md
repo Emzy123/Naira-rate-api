@@ -13,7 +13,7 @@ Nigerians and businesses quote dollars at two prices: the official rate and the 
 | `GET /` | free | Service info, prices, pay-to address |
 | `GET /health` | free | Status |
 | `GET /v1/rates` | $0.01 | Official USD/NGN, street (crypto P2P) rates from Quidax and Luno, street premium, plain-English summary |
-| `GET /v1/convert?amount=100&from=USD&basis=street` | $0.005 | USD↔NGN conversion at official or street rate |
+| `GET /v1/convert?amount=100&from=USD&basis=street` | $0.003 | USD↔NGN conversion at official or street rate |
 
 ## Run it
 ```bash
