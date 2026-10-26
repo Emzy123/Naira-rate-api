@@ -5,6 +5,7 @@ import { ExactEvmScheme } from "@x402/evm/exact/server";
 import { HTTPFacilitatorClient } from "@x402/core/server";
 import { ASSET, FACILITATOR_URL, NETWORK, PAY_TO, PORT, IS_MAINNET, usd } from "./config.js";
 import { convert, getSnapshot, summarize } from "./rates.js";
+import { registerBot } from "./bot.js";
 
 if (!process.env.X402_API_KEY) throw new Error("X402_API_KEY missing (get one at https://x402.celo.org)");
 if (!PAY_TO) throw new Error("SELLER_PAY_TO missing");
@@ -50,6 +51,7 @@ app.get("/", (c) =>
 );
 app.get("/health", (c) => c.json({ ok: true, mainnet: IS_MAINNET }));
 
+registerBot(app)
 app.use(paymentMiddleware(routes as any, server));
 
 app.get("/v1/rates", async (c) => {
