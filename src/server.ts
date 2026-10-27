@@ -174,3 +174,12 @@ app.get("/v1/convert", async (c) => {
 serve({ fetch: app.fetch, port: PORT }, () =>
   console.log(`Naira Rates API on :${PORT} (${IS_MAINNET ? "MAINNET" : "testnet"}, ${ASSET.symbol} -> ${PAY_TO})`),
 );
+
+// Keep-warm: Render's free tier sleeps after 15 min with no traffic.
+// Ping our own public /health every 10 min so paying agents never hit a cold start.
+const SELF_URL = process.env.RENDER_EXTERNAL_URL || process.env.PUBLIC_URL;
+if (SELF_URL) {
+  setInterval(() => {
+    fetch(`${SELF_URL.replace(/\/$/, "")}/health`).catch(() => {});
+  }, 10 * 60 * 1000);
+}
