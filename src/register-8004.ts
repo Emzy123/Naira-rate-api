@@ -7,6 +7,7 @@ import { createPublicClient, createWalletClient, http, encodeFunctionData, conca
 import { privateKeyToAccount } from "viem/accounts";
 import { celo } from "viem/chains";
 import { toDataSuffix } from "@celo/attribution-tags";
+import { privateKeyFromEnv } from "./config.js";
 
 const REGISTRY = "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432";
 const abi = [
@@ -16,9 +17,9 @@ const abi = [
 
 const uri = process.env.AGENT_URI;
 const code = process.env.ATTRIBUTION_CODE; // the celo_... code from Loops House enrollment
-if (!uri || !code || !process.env.OWNER_PRIVATE_KEY) throw new Error("Set OWNER_PRIVATE_KEY, ATTRIBUTION_CODE and AGENT_URI");
+if (!uri || !code) throw new Error("Set OWNER_PRIVATE_KEY, ATTRIBUTION_CODE and AGENT_URI");
 
-const account = privateKeyToAccount(process.env.OWNER_PRIVATE_KEY as `0x${string}`);
+const account = privateKeyToAccount(privateKeyFromEnv("OWNER_PRIVATE_KEY"));
 const pub = createPublicClient({ chain: celo, transport: http("https://forno.celo.org") });
 
 // Check the file is reachable before paying to point at it.

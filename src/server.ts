@@ -4,13 +4,17 @@ import { paymentMiddleware, x402ResourceServer } from "@x402/hono";
 import { ExactEvmScheme } from "@x402/evm/exact/server";
 import { HTTPFacilitatorClient } from "@x402/core/server";
 import { bazaarResourceServerExtension, declareDiscoveryExtension } from "@x402/extensions/bazaar";
-import { ASSET, FACILITATOR_URL, NETWORK, PAY_TO, PORT, IS_MAINNET, usd } from "./config.js";
+import { ASSET, FACILITATOR_URL, NETWORK, PAY_TO, PORT, IS_MAINNET, IS_DEMO, usd } from "./config.js";
 import { convert, getSnapshot, summarize } from "./rates.js";
 import { registerBot } from "./bot.js";
 import { registerPage } from "./register-page.js";
 
-if (!process.env.X402_API_KEY) throw new Error("X402_API_KEY missing (get one at https://x402.celo.org)");
-if (!PAY_TO) throw new Error("SELLER_PAY_TO missing");
+// Demo mode (X402_DEMO=1, or no secrets present): starts without a facilitator
+// key or pay-to wallet. Paid routes are served free and flagged demo: true.
+if (!IS_DEMO) {
+  if (!process.env.X402_API_KEY) throw new Error("X402_API_KEY missing (get one at https://x402.celo.org, or set X402_DEMO=1 for demo mode)");
+  if (!PAY_TO) throw new Error("SELLER_PAY_TO missing (or set X402_DEMO=1 for demo mode)");
+}
 
 const facilitator = new HTTPFacilitatorClient({
   url: FACILITATOR_URL,
@@ -93,7 +97,7 @@ app.get("/", (c) =>
     howToPay: "https://x402.celo.org/skill.md (buyer flow, @x402/fetch)",
   }),
 );
-app.get("/health", (c) => c.json({ ok: true, mainnet: IS_MAINNET }));
+app.get("/health", (c) => c.json({ ok: true, mainnet: IS_MAINNET, demo: IS_DEMO }));
 
 // Free: machine-readable discovery for crawlers (agent402.tools reads /.well-known/x402, then /openapi.json).
 const originOf = (c: any) => {
@@ -155,7 +159,12 @@ app.get("/openapi.json", (c) => {
 registerBot(app);
 registerPage(app);
 
-app.use(paymentMiddleware(routes as any, server));
+// Real payment enforcement only outside demo mode.
+if (!IS_DEMO) {
+  app.use(paymentMiddleware(routes as any, server));
+} else {
+  console.log("DEMO MODE: no X402_API_KEY/SELLER_PAY_TO set. Paid routes are served free and flagged demo: true.");
+}
 
 app.get("/v1/rates", async (c) => {
   const s = await getSnapshot();

@@ -3,9 +3,9 @@ import "dotenv/config";
 import { x402Client, wrapFetchWithPayment } from "@x402/fetch";
 import { ExactEvmScheme } from "@x402/evm/exact/client";
 import { privateKeyToAccount } from "viem/accounts";
-import { ASSET, NETWORK, IS_MAINNET } from "./config.js";
+import { ASSET, NETWORK, IS_MAINNET, privateKeyFromEnv } from "./config.js";
 
-const account = privateKeyToAccount(process.env.BUYER_PRIVATE_KEY as `0x${string}`);
+const account = privateKeyToAccount(privateKeyFromEnv("BUYER_PRIVATE_KEY"));
 const client = new x402Client();
 client.setSpendControls({ allowedAssets: [{ network: NETWORK, asset: ASSET.address, maxAmountPerPayment: "20000" }] });
 client.register("eip155:*", new ExactEvmScheme(account, { rpcUrl: IS_MAINNET ? "https://forno.celo.org" : "https://forno.celo-sepolia.celo-testnet.org" }));
